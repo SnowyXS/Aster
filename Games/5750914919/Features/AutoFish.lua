@@ -68,11 +68,11 @@ do -- Cast
     local function Cast()
         task.wait(.1)
 
-        if not newValue and autoCastToggle.Value and Rod:IsEquipped() then
-            local isSkip = castType.Value == "Skip"
-            percentage = IsPerfect() and 100 or RandomNumber(82, 90)
-
-            Rod:Cast(isSkip, percentage)
+        if autoCastToggle.Value and Rod:IsEquipped() then
+            Rod:Cast(
+                castType.Value == "Skip",
+                IsPerfect() and 100 or RandomNumber(82, 90)
+            )
         end
     end
 
@@ -122,9 +122,6 @@ do -- Cast
         rootPart.ChildAdded:Connect(OnRootPartChildAdded)
     end
 
-    LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
-    rootPart.ChildAdded:Connect(OnRootPartChildAdded)
-
     autoCastToggle:OnChanged(function(value)
         if not Rod:IsEquipped() or not value then return end 
         local isSkip = castType.Value == "Skip"
@@ -132,6 +129,9 @@ do -- Cast
 
         Rod:Cast(isSkip, percentage)
     end)
+
+    LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
+    rootPart.ChildAdded:Connect(OnRootPartChildAdded)
 end
 
 do -- Shake
@@ -172,76 +172,26 @@ do -- Shake
         Tooltip = "Mouse Click will use VirtualInputManager to click the Shake.\nNavigation will use UI Navigation to press the Shake.",
     })
 
-    local shakeFunctions = {}
-
-    shakeFunctions.Navigation = function(button)
-        button.Active = true
-        button.Selectable = true
-
-        GuiService.SelectedObject = button
-
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-    end
-
-    shakeFunctions.Mouse = function(button)
-        local x = button.AbsolutePosition.X + (button.AbsoluteSize.X / 2)
-        local y = button.AbsolutePosition.Y + (button.AbsoluteSize.Y / 2)
-
-        VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 1)
-        VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 1)
-    end
-
-    shakeFunctions.Remote = function(button)
-        local shakeRemote = button:FindFirstChild("shake")
-
-        if shakeRemote then
-            task.spawn(shakeRemote.FireServer, shakeRemote)
-        end
-    end
-    
-    local function Press(button)
-        shakeFunctions[shakeType.Value](button)
-    end
-
-    local function OnToggle(bool)
-        if not bool then return end
-
-        local shakeui = playerGui:FindFirstChild("shakeui")
-        if not shakeui then return end
-
-        local safezone = shakeui.safezone
-        local button = safezone:FindFirstChild("button")
-
-        if button then
-            Press(button)
-        end
-    end
-
-
     playerGui.ChildAdded:Connect(function(instance)
         if instance.Name == "shakeui" then
             local safezone = instance.safezone
             local button = safezone:WaitForChild("button")
+            local connection = getconnection(button.Activated, 1)
 
-            if autoShakeToggle.Value then Press(button) end
+            if connection then
+                local Shake = connection.Function
 
-            safezone.ChildAdded:Connect(function(button)
-                if autoShakeToggle.Value and button:IsA("ImageButton") then 
+                if autoShakeToggle.Value then 
                     local minDelay = minDelaySlider.Value
                     local maxDelay = maxDelaySlider.Value
-                    task.wait(minDelay, maxDelay)
 
-                    if button.Parent then
-                        Press(button)
-                    end
+                    repeat 
+                        Shake()
+                        task.wait(minDelay, maxDelay)
+                    until not instance.Parent 
                 end
-            end)
+            end
         end
-    end)
-
-    playerGui.ChildRemoved:Connect(function(instance)
-        if instance.name == "shakeui" then GuiService.SelectedObject = nil end
     end)
 
     autoShakeToggle:OnChanged(OnToggle)

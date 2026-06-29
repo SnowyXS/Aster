@@ -18,6 +18,9 @@ local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local animator = humanoid.Animator
 
+local packages = ReplicatedStorage:WaitForChild("packages")
+local Net = require(packages:WaitForChild("Net"))
+
 local RodController = {}
 RodController.__index = RodController
 
@@ -39,15 +42,14 @@ function RodController.new()
         _onCastEvent = onCastEvent,
         _rodEquippedEvent = rodEquippedEvent,
         _rodUnEquippedEvent = rodUnEquippedEvent,
-        _rodChildRemoved = childRemovedEvent
+        _rodChildRemoved = childRemovedEvent,
+        _castRemote = Net:RemoteFunction("FishingRod/Cast", -1),
+        _resetRemote = Net:RemoteEvent("FishingRod/Reset", -1)
     }, RodController)
 
     for _, v in pairs(backpack:GetChildren()) do
         if IsRod(v) then
-            local events = v.events
             Controller._rod = v
-            Controller._castRemote = events.castAsync
-            Controller._resetRemote = events.reset
     
             break
         end
@@ -55,10 +57,7 @@ function RodController.new()
     
     for _, v in pairs(character:GetChildren()) do
         if IsRod(v) then
-            local events = v.events
             Controller._rod = v
-            Controller._castRemote = events.castAsync
-            Controller._resetRemote = events.reset
             Controller._isEquipped = true
             
             break
@@ -83,13 +82,9 @@ function RodController.new()
         childRemovedEvent:Fire(instance)
     end
 
-    local function OnBackPackChildAdded(instance)
+    local function OnChildAdded(instance)
         if Controller._rod == instance or not IsRod(instance) then return end
-
-        local events = instance:WaitForChild("events")
         Controller._rod = instance
-        Controller._castRemote = events.castAsync
-        Controller._resetRemote = events.reset
 
         local values = instance.values
         local casted = values.casted
@@ -109,7 +104,7 @@ function RodController.new()
         backpack = LocalPlayer.Backpack
         character = newCharacter
 
-        backpack.ChildAdded:Connect(OnBackPackChildAdded)
+        backpack.ChildAdded:Connect(OnChildAdded)
     end
 
     local rodObject = Controller._rod
@@ -122,7 +117,7 @@ function RodController.new()
 
     casted.Changed:Connect(OnCastChanged)
 
-    backpack.ChildAdded:Connect(OnBackPackChildAdded)
+    backpack.ChildAdded:Connect(OnChildAdded)
     LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
 
     return Controller
@@ -142,7 +137,7 @@ function RodController:Cast(skip, percentage)
     if not skip then return VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1) end
     
     local castRemote = self._castRemote
-    castRemote:InvokeServer(percentage or 100, 1, not percentage or false) 
+    castRemote:InvokeServer(percentage, percentage == 100) 
 end
 
 function RodController:Reset()
