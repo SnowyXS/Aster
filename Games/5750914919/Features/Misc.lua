@@ -88,7 +88,7 @@ do -- Misc
                     for _, fish in pairs(zone.ZoneFish:GetChildren()) do
                         if not spearFishingToggle.Value then break end
                         minigame:FireServer(fish:GetAttribute("UID"))
-                        task.wait(0.55)
+                        task.wait(2)
                         minigame:FireServer(fish:GetAttribute("UID"), true)
                     end
                 end

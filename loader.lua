@@ -4,7 +4,7 @@ local ThemeManager = loadstring(game:HttpGet(uiRepo .. "addons/ThemeManager.lua"
 local SaveManager = loadstring(game:HttpGet(uiRepo .. "addons/SaveManager.lua"))()
 
 local Window = Library:CreateWindow({
-    Title = "🪻 Aster 🪻",
+    Title = "Aster",
     Center = true, 
     AutoShow = false,
 })

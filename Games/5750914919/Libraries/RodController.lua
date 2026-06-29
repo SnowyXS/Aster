@@ -19,7 +19,7 @@ local humanoid = character:WaitForChild("Humanoid")
 local animator = humanoid.Animator
 
 local packages = ReplicatedStorage:WaitForChild("packages")
-local Net = require(packages:WaitForChild("Net"))
+local Net = packages:WaitForChild("Net")
 
 local RodController = {}
 RodController.__index = RodController
@@ -43,8 +43,8 @@ function RodController.new()
         _rodEquippedEvent = rodEquippedEvent,
         _rodUnEquippedEvent = rodUnEquippedEvent,
         _rodChildRemoved = childRemovedEvent,
-        _castRemote = Net:RemoteFunction("FishingRod/Cast", -1),
-        _resetRemote = Net:RemoteEvent("FishingRod/Reset", -1)
+        _castRemote = Net:WaitForChild("RF/FishingRod/Cast"),
+        _resetRemote = Net:WaitForChild("RE/FishingRod/Reset")
     }, RodController)
 
     for _, v in pairs(backpack:GetChildren()) do
@@ -64,7 +64,7 @@ function RodController.new()
         end
     end
 
-    local function OnCastChanged(newValue)
+    local function OnStateChanged(newValue)
         onCastEvent:Fire(newValue)
     end
 
@@ -87,12 +87,12 @@ function RodController.new()
         Controller._rod = instance
 
         local values = instance.values
-        local casted = values.casted
+        local state = values.state
 
         instance.Equipped:Connect(OnEquip)
         instance.Unequipped:Connect(OnUnequip)
         instance.ChildRemoved:Connect(OnChildRemoved)
-        casted.Changed:Connect(OnCastChanged)
+        state.Changed:Connect(OnStateChanged)
 
         rodAddedEvent:Fire(instance)
     end
@@ -109,13 +109,13 @@ function RodController.new()
 
     local rodObject = Controller._rod
     local values = rodObject.values
-    local casted = values.casted
+    local state = values.state
 
     rodObject.Equipped:Connect(OnEquip)
     rodObject.Unequipped:Connect(OnUnequip)
     rodObject.ChildRemoved:Connect(OnChildRemoved)
 
-    casted.Changed:Connect(OnCastChanged)
+    state.Changed:Connect(OnStateChanged)
 
     backpack.ChildAdded:Connect(OnChildAdded)
     LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
@@ -162,10 +162,10 @@ function RodController:OnAdded(callback)
     rodAddedEvent:Connect(callback)
 end
 
-function RodController:OnCastChanged(callback)
-    local castEventChanged = self._onCastEvent
+function RodController:OnStateChanged(callback)
+    local stateChanged = self._onCastEvent
 
-    castEventChanged:Connect(callback)
+    stateChanged:Connect(callback)
 end
 
 function RodController:OnEquipped(callback)

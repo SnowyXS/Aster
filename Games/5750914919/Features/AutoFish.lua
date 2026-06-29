@@ -59,7 +59,6 @@ do -- Cast
         Tooltip = "Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.",
     })
 
-    local percentage
     local function IsPerfect()
         local chance = RandomNumber(1, 100)
         return chance <= perfectSlider.Value
@@ -76,8 +75,8 @@ do -- Cast
         end
     end
 
-    Rod:OnCastChanged(function(newValue)
-        if not newValue then
+    Rod:OnStateChanged(function(state)
+        if state == 3 then
             Cast()
         end
     end)
@@ -100,8 +99,7 @@ do -- Cast
             
             local connection
             connection = bar:GetPropertyChangedSignal("Size"):Connect(function()
-                if not percentage then return end
-                local scale = percentage / 100
+                local scale = RandomNumber(82, 90) / 100
 
                 if (scale == 1 and bar.Size.Y.Scale == scale) or (scale < 1 and bar.Size.Y.Scale / scale >= 0.94) then
                     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
@@ -123,11 +121,7 @@ do -- Cast
     end
 
     autoCastToggle:OnChanged(function(value)
-        if not Rod:IsEquipped() or not value then return end 
-        local isSkip = castType.Value == "Skip"
-        percentage = IsPerfect() and 100 or RandomNumber(82, 90)
-
-        Rod:Cast(isSkip, percentage)
+        Cast()
     end)
 
     LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
@@ -193,8 +187,6 @@ do -- Shake
             end
         end
     end)
-
-    autoShakeToggle:OnChanged(OnToggle)
 end
 
 do -- Reel
