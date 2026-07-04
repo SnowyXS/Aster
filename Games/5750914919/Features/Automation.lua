@@ -63,7 +63,8 @@ do -- appraise
     
     local function Appraise()
         dialogInteract:InvokeServer(1, 1)
-        dialogInteract:InvokeServer(6, 1)
+        dialogInteract:InvokeServer(5, 1)
+        dialogInteract:InvokeServer(3, 1)
     end
 
     local appraiseTab = autoTabbox:AddTab("Appraise")
