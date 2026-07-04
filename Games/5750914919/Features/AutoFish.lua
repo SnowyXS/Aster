@@ -170,7 +170,7 @@ do -- Shake
         if instance.Name == "shakeui" then
             local safezone = instance.safezone
             local button = safezone:WaitForChild("button")
-            local connection = getconnection(button.Activated, 1)
+            local connection = getconnections(button.Activated)[1] 
 
             if connection then
                 local Shake = connection.Function
