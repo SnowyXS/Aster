@@ -3,22 +3,22 @@
 > **⚠️ Work in Progress**
 >
 > This project is currently in development and some features may be broken.
-## 🕹️ Current Games
+## Supported Games
 
 * 🎣 Fisch
 
-## 🛣️ Roadmap
+##  Roadmap
 
-### 🎯 Features
+### Features
 
-* [ ] ✨ Auto Enchant
-* [ ] 📦 Fast Open Crates
-* [ ] 🦀 Fast Place Crab Cages
-* [ ] 📖 Bestiary Farm
-* [ ] 🎨 Rod Passive Changer
+* [ ]  Auto Enchant
+* [ ]  Fast Open Crates
+* [ ]  Fast Place Crab Cages
+* [ ]  Bestiary Farm
+* [ ]  Rod Passive Changer
 
-### 🛠️ Improvements
+### Improvements
 
-* [x] 🧹 Clean up & optimize code
-* [x] 🚀 Performance improvements
-* [x] 🐛 Fix known bugs
+* [x]  Clean up & optimize code
+* [x]  Performance improvements
+* [x]  Fix known bugs
