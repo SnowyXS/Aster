@@ -12,7 +12,6 @@
 ### Features
 
 * [ ]  Auto Enchant
-* [ ]  Fast Open Crates
 * [ ]  Fast Place Crab Cages
 * [ ]  Bestiary Farm
 * [ ]  Rod Passive Changer
