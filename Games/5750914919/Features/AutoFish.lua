@@ -227,6 +227,15 @@ do -- Reel
         local perfectChance = perfectSlider.Value 
         isPerfect = chance <= perfectChance 
         CurrentController = OldNew(...)
+
+        hookfunction(CurrentController.Log, function()
+            return
+        end)
+
+        hookfunction(CurrentController.Snapshot, function()
+            return
+        end)
+        
         if instantCatchToggle.Value then CurrentController:AddModifier("progress", "force", 100) end
 
         if autoReelToggle.Value then

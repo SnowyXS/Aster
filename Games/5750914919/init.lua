@@ -9,6 +9,7 @@ local featuresPath = paths.features
 local infoPath = paths.info
 
 local LoadedFeatures = {
+    "Bypass",
     "AutoFish",
     "PlayerModifications",
     "Automation",
@@ -20,7 +21,7 @@ local info = HttpService:JSONDecode(readfile(infoPath))
 local name, version = info.name, info.version
 UI.gameTab = Window:AddTab(name)
 
-for _, feature in pairs(LoadedFeatures) do
+for _, feature in ipairs(LoadedFeatures) do
     local featurePath = string.format(featuresPath .. "/%s.lua", feature)
     assert(isfile(featurePath), feature.. " file couldn't be found.")
     
