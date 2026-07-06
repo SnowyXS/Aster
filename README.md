@@ -3,7 +3,7 @@
 > **⚠️ Work in Progress**
 >
 > This project is currently in development and some features may be broken.
-## ✨ Current Games
+## 🕹️ Current Games
 
 * 🎣 Fisch
 
