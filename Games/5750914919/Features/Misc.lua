@@ -9,10 +9,10 @@ local packages = ReplicatedStorage.packages
 local netModule = packages.Net
 
 local shared = ReplicatedStorage:WaitForChild("shared")
-local modules = shared.modules
+local sharedModules = shared.modules
 
 local Net = require(netModule)
-local NumberUtils = require(modules.NumberUtils)
+local NumberUtils = require(sharedModules.NumberUtils)
 local CurrencyController = require(ReplicatedStorage.client.legacyControllers.CurrencyController)
 
 local LocalPlayer = Players.LocalPlayer
@@ -177,6 +177,49 @@ do -- Misc
         end)
     end
 
+    do --  Fast Place Crab Cages
+        local SharedCrabCage = require(sharedModules:WaitForChild("SharedCrabCage"))
+        local CrabCageController = require(ReplicatedStorage.client.legacyControllers.CrabCageController)
+        miscTab:AddDivider()
+        
+        miscTab:AddLabel("Fast Place | Crab Cages"):AddKeyPicker("FastPlace", {
+            Default = "Z",
+            Mode = "Hold",
+            NoUI = false, 
+            Text = "Fast Place Crab Cages",
+        })
+
+        miscTab:AddLabel("Fast Claim | Crab Cages"):AddKeyPicker("FastClaim", {
+            Default = "X",
+            NoUI = false, 
+            Text = "Fast Claim Crab Cages",
+
+            Callback = function(Value)
+                for _, v in pairs(CrabCageController.ActiveCages) do
+                    local data = v.data.s
+
+                    if data == SharedCrabCage.CageState.Claimable then
+                        CrabCageController:Claim(v)
+
+                        task.wait(0.1)
+                    end
+                end
+            end,
+        })
+
+        task.spawn(function()
+            while true do
+                local state = Options.FastPlace:GetState()
+
+                if state and CrabCageController._HeldCage then
+                    CrabCageController:Place(CrabCageController._HeldCage, CrabCageController._PreviewModel:GetPivot())
+                end
+
+                task.wait()
+            end
+        end)
+    end
+
     local function OnCharacterAdded(newCharacter)
         character = newCharacter
         rootPart = character:WaitForChild("HumanoidRootPart")
@@ -190,7 +233,7 @@ do -- Items
     --local inventory = CharacterModule.PS(LocalPlayer):WaitForChild("Inventory")
 
     local purchaseRemote = events.purchase
-    local library = modules.library
+    local library = sharedModules.library
 
     local allRods = require(library.rods)
     local allFish = require(library.fish)
@@ -255,24 +298,4 @@ end
 
 do -- Bestiary
     local bestiaryTab = box:AddTab("Bestiary")
-    local discoverLocation = events.discoverlocation
-
-    local hud = playerGui:WaitForChild("hud")
-    local safezone = hud.safezone
-    local bestiary = safezone.bestiary
-
-    local limitedCatagory = bestiary.NormalCategory
-    local normalCatagory = bestiary.NormalCategory
-
-    bestiaryTab:AddButton("Discover all locations", function() 
-        for i, v in pairs(normalCatagory.scroll:GetChildren()) do
-            if not v:IsA("ImageButton") then continue end
-            discoverLocation:FireServer(v.Name)
-        end
-
-        for i, v in pairs(limitedCatagory.scroll:GetChildren()) do
-            if not v:IsA("ImageButton") then continue end
-            discoverLocation:FireServer(v.Name)
-        end
-    end)
 end
