@@ -5,7 +5,7 @@
 > This project is currently in development and some features may be broken.
 ## Supported Games
 
-* 🎣 Fisch
+*  Fisch
 
 ##  Roadmap
 
