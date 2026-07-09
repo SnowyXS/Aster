@@ -156,15 +156,6 @@ do -- Shake
         Rounding = 1,
         Compact = false,
     })
-            
-    local shakeType = shakeTab:AddDropdown("ShakeTypeDropDown", {
-        Values = {"Navigation", "Mouse", "Remote"},
-        Default = 1,
-        Multi = false,
-    
-        Text = "Type",
-        Tooltip = "Mouse Click will use VirtualInputManager to click the Shake.\nNavigation will use UI Navigation to press the Shake.",
-    })
 
     playerGui.ChildAdded:Connect(function(instance)
         if instance.Name == "shakeui" then
@@ -235,7 +226,7 @@ do -- Reel
         hookfunction(CurrentController.Snapshot, function()
             return
         end)
-        
+
         if instantCatchToggle.Value then CurrentController:AddModifier("progress", "force", 100) end
 
         if autoReelToggle.Value then

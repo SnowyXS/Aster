@@ -154,6 +154,10 @@ do -- Player Tab
     end
 
     do -- WalkSpeed / JumpPower
+        local metatable = getrawmetatable(game)
+        local __index = metatable.__index
+        local __newindex = metatable.__newindex
+
         local walkSpeedSlider = playerTab:AddSlider("WalkSpeedSlider", {
             Text = "WalkSpeed",
             Default = 16,
@@ -175,7 +179,7 @@ do -- Player Tab
         })
 
         local OldIndex
-        OldIndex = hookmetamethod(game, "__index", function(self, index, value)
+        OldIndex = oth.hook(__index, function(self, index)
             if not checkcaller() then
                 if index == "WalkSpeed" then
                     return 16
@@ -184,18 +188,18 @@ do -- Player Tab
                 end
             end
 
-            return OldIndex(self, index, value)
+            return OldIndex(self, index)
         end)
 
         local OldNewIndex
-        OldNewIndex = hookmetamethod(game, "__newindex", function(self, index, value)
+        OldNewIndex = oth.hook(__newindex, function(self, index, value)
             if not checkcaller() then
                 if index == "WalkSpeed" or index == "JumpPower" then
                     return
                 end
             end
 
-            return OldNewIndex(self, index, value)
+            return OldNewIndex(self, index, value) 
         end)
 
         local function OnWalkSpeedChanged(value)
