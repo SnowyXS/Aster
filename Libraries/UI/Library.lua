@@ -168,6 +168,8 @@ do
 		local Window = self.Window
 		local category = Window:create_category(title)
 		self:create_button(title):set_category(category)
+
+		return category
 	end
 
 	function Base:move(amount)
