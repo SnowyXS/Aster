@@ -54,7 +54,9 @@ do
 		Library.init_highlight(self, row)
 
 		self.size = self.size + 1
-		Window:resize(self)
+		if Window.current_category == self then
+            Window:resize(self)
+        end
 
 		return button
 	end
@@ -102,7 +104,9 @@ do
 		Library.init_highlight(self, row)
 
 		self.size = self.size + 1
-		Window:resize(self)
+		if Window.current_category == self then
+            Window:resize(self)
+        end
 
 		return toggle
 	end
@@ -159,7 +163,10 @@ do
 		Library.init_highlight(self, row)
 
 		self.size = self.size + 1
-		Window:resize(self)
+        
+		if Window.current_category == self then
+            Window:resize(self)
+        end
 
 		return slider
 	end
@@ -415,6 +422,5 @@ function Library.set_properties(instance, properties)
 		instance[i] = v
 	end
 end
-
 
 return Library
