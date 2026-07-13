@@ -524,7 +524,7 @@ function Library:create_window(title, icon, version)
 	function Window:resize(category)
 		main_frame.Size = UDim2.new(0, 300, 0, 70 + category.size * 35)
 	end
-
+	
 	UserInputService.InputBegan:Connect(function(input)
 		local key = input.KeyCode
 		local category = Window.current_category
@@ -541,6 +541,8 @@ function Library:create_window(title, icon, version)
 			category:click()
 		elseif key == Enum.KeyCode.Backspace then
 			Window:close_category()
+		elseif key == Enum.KeyCode.Insert then
+			main_frame.Visible = not main_frame.Visible
 		end
 	end)
 
