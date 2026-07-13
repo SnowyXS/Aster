@@ -15,7 +15,7 @@ local LoadedFeatures = {
     "PlayerModifications",
     "Automation",
     "Teleport",
-    --"Misc",
+    "Misc",
 }
 
 local info = HttpService:JSONDecode(readfile(infoPath))
