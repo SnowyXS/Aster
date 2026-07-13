@@ -1,3 +1,5 @@
+--[[
+
 local uiRepo = "https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/"
 local Library = loadstring(game:HttpGet(uiRepo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(uiRepo .. "addons/ThemeManager.lua"))()
@@ -9,10 +11,19 @@ local Window = Library:CreateWindow({
     AutoShow = false,
 })
 
+]]
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/Aster/refs/heads/stable/Libraries/UI/Library.lua"))()
+local Window = Library:create_window(
+	"Aster", 
+	"rbxassetid://115819865049802", 
+	"v1.0"
+)
+
 getgenv().Snowy = {
     UI = {
         Library = Library,
-        Window = Window
+        Window = Window,
+        Category = Window:create_category("main")
     },
 }
 
@@ -88,6 +99,7 @@ for _, folder in pairs(games) do
     end
 end
 
+--[[
 SaveManager:SetFolder("Aster/Configs/" .. gameID)
 
 local settingsTab = Window:AddTab("Settings")
@@ -110,3 +122,4 @@ SaveManager:BuildConfigSection(settingsTab)
 ThemeManager:ApplyToTab(settingsTab)
 
 Library.Toggle()
+]]

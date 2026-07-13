@@ -3,6 +3,7 @@ local HttpService = game:GetService("HttpService")
 local UI = Snowy.UI
 local Library = UI.Library
 local Window = UI.Window
+local Category = UI.Category
 
 local paths = Snowy.paths
 local featuresPath = paths.features
@@ -13,13 +14,13 @@ local LoadedFeatures = {
     "AutoFish",
     "PlayerModifications",
     "Automation",
-    "Teleport",
-    "Misc",
+    --"Teleport",
+    --"Misc",
 }
 
 local info = HttpService:JSONDecode(readfile(infoPath))
 local name, version = info.name, info.version
-UI.gameTab = Window:AddTab(name)
+UI.gameTab = Category:create_category(name)
 
 for _, feature in ipairs(LoadedFeatures) do
     local featurePath = string.format(featuresPath .. "/%s.lua", feature)
@@ -28,4 +29,4 @@ for _, feature in ipairs(LoadedFeatures) do
     loadfile(featurePath)()
 end
 
-Library:Notify(`Loaded {name} {version}`, 5)
+print(`Loaded {name} {version}`)

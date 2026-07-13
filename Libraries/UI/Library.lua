@@ -37,7 +37,7 @@ do
 				bindable:Fire()
 			end
 		end
-
+	
 		function button:set_category(category)
 			local image_label = Instance.new("ImageLabel", row)
 			image_label.AnchorPoint = Vector2.new(1, 0.5)
@@ -230,6 +230,45 @@ do
 			end
 			
 			return value
+		end
+		
+		function dropdown:set_options(new_options)
+			new_options = new_options or {}
+
+			local old_selected_values = {}
+			if self.Multi then
+				for i, was_selected in pairs(self.Selected) do
+					if was_selected and self.Options[i] then
+						old_selected_values[self.Options[i]] = true
+					end
+				end
+			end
+
+			self.Options = new_options
+			self.Selected = {}
+			self.Index = 1
+
+			if self.Multi then
+				for i, opt in ipairs(self.Options) do
+					if old_selected_values[opt] then
+						self.Selected[i] = true
+					end
+				end
+			end
+
+			local value = self.Options[self.Index]
+			dropdown_value.Text = `< {value} >`
+			dropdown_value.TextColor3 = self.Selected[self.Index] and Color3.fromRGB(39, 255, 6) or Color3.fromRGB(184, 184, 184)
+
+			if self.Multi then
+				local list = {}
+				for i in ipairs(self.Options) do
+					if self.Selected[i] then
+						table.insert(list, self.Options[i])
+					end
+				end
+				bindable:Fire(list)
+			end
 		end
 		
 		function dropdown:set_value(direction)

@@ -1,5 +1,6 @@
 local UI = Snowy.UI
 local gameTab = UI.gameTab
+local Category = UI.Category
 
 local Players = game:GetService("Players")
 
@@ -7,9 +8,49 @@ local LocalPlayer = Players.LocalPlayer
 local character = LocalPlayer.Character
 
 local rootPart = character:WaitForChild("HumanoidRootPart")
+local teleportTab Category:create_category("Teleport")
+
+local function get_players_string()
+    local player_list = {}
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer then
+            table.insert(player_list, v.Name)
+        end
+    end
+
+    return player_list
+end
 
 do -- Teleports
-    local tpTabbox = gameTab:AddLeftTabbox()
+    do -- Players
+        local playersTab = teleportTab:create_category("Players")
+
+        local playersDropDown = playersTab:create_dropdown("Players", {
+            Options = get_players_string()
+        })
+
+        local teleportButton = playersTab:create_button("Teleport")
+
+        teleportButton:on_changed(function() 
+            local player = Players:FindFirstChild(playersDropDown.Value)
+            if not player then return end
+            
+            local character = player.Character
+
+            LocalPlayer:RequestStreamAroundAsync(character:GetPivot().p)
+
+            local TRootPart = character.HumanoidRootPart
+            rootPart.CFrame = TRootPart.CFrame
+        end)
+
+        local function on_player_change()
+            playersDropDown:set_options(get_players_string())
+        end
+
+        Players.PlayerAdded:Connect(on_player_change)
+        Players.PlayerRemoving:Connect(on_player_change)
+    end
 
     do -- Locations
         local world = workspace:WaitForChild("world")
@@ -25,18 +66,15 @@ do -- Teleports
             table.insert(dropDownLocations, location) 
         end
 
-        local locationTab = tpTabbox:AddTab("Locations")
+        local locationTab = teleportTab:create_category("Locations")
 
-        local dropDown = locationTab:AddDropdown("LocationsDropDown", {
-            Values = dropDownLocations,
-            Default = 1,
-            Multi = false,
-        
-            Text = "Locations",
-            Tooltip = "This is a tooltip",
+        local dropDown = locationTab:create_dropdown("Locations", {
+            Options = dropDownLocations,
         })
 
-        locationTab:AddButton("Teleport", function() 
+        local teleportButton = locationTab:create_button("Teleport")
+
+        teleportButton:on_changed(function() 
             local location = dropDown.Value
             if not location then return end
 
@@ -45,28 +83,6 @@ do -- Teleports
             LocalPlayer:RequestStreamAroundAsync(cframe.p)
 
             rootPart.CFrame = cframe
-        end)
-    end
-
-    do -- Players
-        local playersTab = tpTabbox:AddTab("Players")
-
-        local playersDropDown = playersTab:AddDropdown("LocationsDropDown", {
-            SpecialType = "Player",
-            Text = "Players",
-            Tooltip = "This is a tooltip",
-        })
-
-        playersTab:AddButton("Teleport", function() 
-            local player = Players:FindFirstChild(playersDropDown.Value)
-            if not player then return end
-            
-            local character = player.Character
-
-            LocalPlayer:RequestStreamAroundAsync(character:GetPivot().p)
-
-            local TRootPart = character.HumanoidRootPart
-            rootPart.CFrame = TRootPart.CFrame
         end)
     end
 

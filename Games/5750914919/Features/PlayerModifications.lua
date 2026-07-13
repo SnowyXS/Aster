@@ -1,6 +1,7 @@
 
 local UI = Snowy.UI
 local gameTab = UI.gameTab
+local Category = UI.Category
 
 local Players = game:GetService("Players")
 
@@ -9,9 +10,8 @@ local character = LocalPlayer.Character
 
 local rootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
-
+local playerTab = Category:create_category("Player")
 do -- Player Tab
-    local playerTab = gameTab:AddRightGroupbox("Player")
     --[[ // Needs update
     do -- Infinite Oxygen, Bypass Temp
         local infOxyGenToggle = playerTab:AddToggle("InfOxyGenToggle", {
@@ -44,11 +44,7 @@ do -- Player Tab
     end
     ]]
     do -- Freeze player
-        local freezeToggle = playerTab:AddToggle("FreezeToggle", {
-            Text = "Freeze",
-            Default = false,
-            Tooltip = "Cold player. No move!",
-        })
+        local freezeToggle = playerTab:create_toggle("Freeze Character")
 
         local bodyPosition
         local function OnFreezeChanged(value)
@@ -63,7 +59,7 @@ do -- Player Tab
             end
         end
 
-        freezeToggle:OnChanged(OnFreezeChanged)
+        freezeToggle:on_changed(OnFreezeChanged)
     end
 
     do -- Anti-AFK
@@ -76,11 +72,7 @@ do -- Player Tab
         local events = ReplicatedStorage:WaitForChild("events")
         local afkEvent = events.afk
 
-        local antiAfkToggle = playerTab:AddToggle("AntiAFKToggle", {
-            Text = "Anti AFK",
-            Default = false,
-            Tooltip = "Want to go make some coffee? No problem. Go make some coffee.",
-        })
+        local antiAfkToggle = playerTab:create_toggle("Anti AFK")
 
         local function SimulatePress()
             VirtualUser:CaptureController()
@@ -146,7 +138,7 @@ do -- Player Tab
             end
 
             afkEvent:FireServer(false)
-            antiAfkToggle:OnChanged(OnToggle)
+            antiAfkToggle:on_changed(OnToggle)
             LocalPlayer.Idled:Connect(SimulatePress)
         end
 
@@ -158,24 +150,19 @@ do -- Player Tab
         local __index = metatable.__index
         local __newindex = metatable.__newindex
 
-        local walkSpeedSlider = playerTab:AddSlider("WalkSpeedSlider", {
+        local walkSpeedSlider = playerTab:create_slider("WalkSpeed", {
             Text = "WalkSpeed",
             Default = 16,
             Min = 16,
-            Suffix = "",
             Max = 500,
-            Rounding = 0,
-            Compact = false,
+            Increment = 10,
         })
 
-        local jumpPowerSlider = playerTab:AddSlider("JumpPowerSlider", {
-            Text = "JumpPower",
+        local jumpPowerSlider = playerTab:create_slider("JumpPower", {
             Default = 50,
             Min = 50,
-            Suffix = "",
             Max = 500,
-            Rounding = 0,
-            Compact = false,
+            Increment = 10,
         })
 
         local OldIndex
@@ -210,8 +197,8 @@ do -- Player Tab
             humanoid.JumpPower = value
         end
 
-        walkSpeedSlider:OnChanged(OnWalkSpeedChanged)
-        jumpPowerSlider:OnChanged(OnJumpPowerChanged)
+        walkSpeedSlider:on_changed(OnWalkSpeedChanged)
+        jumpPowerSlider:on_changed(OnJumpPowerChanged)
     end
 
     local function OnCharacterAdded(newCharacter)

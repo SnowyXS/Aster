@@ -13,8 +13,6 @@ local character = LocalPlayer.character
 local rootPart = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
-local autoTabbox = gameTab:AddLeftTabbox()
-
 local paths = Snowy.paths
 local libraries = paths.libraries
 
@@ -25,38 +23,28 @@ local function RandomNumber(min, max)
     return math.round(rand.NextNumber(rand, min, max))
 end    
 
+local auto_fish_category = gameTab:create_category("Auto Fish")
+
 do -- Cast
-    local castTab = autoTabbox:AddTab("Cast")
+    local castTab = auto_fish_category:create_category("Cast")
 
-    local autoCastToggle = castTab:AddToggle("AutoCastToggle", {
-        Text = "Auto-Cast",
-        Default = false,
-        Tooltip = "Will automatically cast the bobber.",
-    })
+    local autoCastToggle = castTab:create_toggle("Auto Cast")
 
-    local autoEquipToggle = castTab:AddToggle("AutoEquipToggle", {
-        Text = "Auto-Equip",
-        Default = false,
-        Tooltip = "Will automatically equip the rod when unequipped.",
-    })
+    local autoEquipToggle = castTab:create_toggle("Auto Equip")
 
-    local perfectSlider = castTab:AddSlider("CastPerfectSlider", {
-        Text = "Perfect Chance",
+    local perfectSlider = castTab:create_slider("Perfect Chance", {
         Default = 42,
         Min = 1,
-        Suffix = "%",
+        Prefix = "%",
         Max = 100,
-        Rounding = 0,
-        Compact = false,
+        Increment = 1
     })
 
-    local castType = castTab:AddDropdown("CastTypeDropDown", {
-        Values = {"Skip", "Normal"},
+    local castType = castTab:create_slider("Cast Type", {
         Default = 1,
-        Multi = false,
-    
-        Text = "Type",
-        Tooltip = "Skip will cast the bobber without the minigame.\nNormal will cast the bobber normally with the minigame.",
+        Min = 1,
+        Max = 2,
+        Increment = 1
     })
 
     local function IsPerfect()
@@ -69,7 +57,7 @@ do -- Cast
 
         if autoCastToggle.Value and Rod:IsEquipped() then
             Rod:Cast(
-                castType.Value == "Skip",
+                castType.Value == 1,
                 IsPerfect() and 100 or RandomNumber(82, 90)
             )
         end
@@ -93,7 +81,7 @@ do -- Cast
     end)
 
     local function OnRootPartChildAdded(instance)
-        if instance.Name == "power" and autoCastToggle.Value and castType.Value == "Normal" then 
+        if instance.Name == "power" and autoCastToggle.Value and castType.Value == 2 then 
             local powerbar = instance:FindFirstChild("powerbar")
             local bar = powerbar.bar
             
@@ -120,7 +108,7 @@ do -- Cast
         rootPart.ChildAdded:Connect(OnRootPartChildAdded)
     end
 
-    autoCastToggle:OnChanged(function(value)
+    autoCastToggle:on_changed(function(value)
         Cast()
     end)
 
@@ -129,32 +117,24 @@ do -- Cast
 end
 
 do -- Shake
-    local shakeTab = autoTabbox:AddTab("Shake")
+    local shakeTab =  auto_fish_category:create_category("Shake")
 
-    local autoShakeToggle = shakeTab:AddToggle("AutoShakeToggle", {
-        Text = "Auto-Shake",
-        Default = false,
-        Tooltip = "Will automatically pass the shake minigame perfectly.",
-    })
+    local autoShakeToggle = shakeTab:create_toggle("Auto Shake")
 
-    local minDelaySlider = shakeTab:AddSlider("ShakeMinSlider", {
-        Text = "Minimum Delay",
+    local minDelaySlider = shakeTab:create_slider("Min Delay", {
         Default = 0.1,
         Min = 0,
-        Suffix = "s",
+        Prefix = "s",
         Max = 1,
-        Rounding = 1,
-        Compact = false,
+        Increment = 0.1
     })
 
-    local maxDelaySlider = shakeTab:AddSlider("ShakeMaxSlider", {
-        Text = "Maximum Delay",
+    local maxDelaySlider = shakeTab:create_slider("Max Delay", {
         Default = 0.1,
         Min = 0,
-        Suffix = "s",
+        Prefix = "s",
         Max = 1,
-        Rounding = 1,
-        Compact = false,
+        Increment = 0.1
     })
 
     playerGui.ChildAdded:Connect(function(instance)
@@ -185,28 +165,18 @@ do -- Reel
     local legacyControllers = client.legacyControllers
     local ReelController = require(legacyControllers.ReelController)
 
-    local reelTab = autoTabbox:AddTab("Reel")
+    local reelTab = auto_fish_category:create_category("Reel")
 
-    local autoReelToggle = reelTab:AddToggle("AutoReelToggle", {
-        Text = "Auto-Reel",
-        Default = false,
-        Tooltip = "Will automatically pass the reel minigame perfectly.",
-    })
+    local autoReelToggle = reelTab:create_toggle("Auto Reel")
 
-    local instantCatchToggle = reelTab:AddToggle("AutoReelToggle", {
-        Text = "Instant-Catch",
-        Default = false,
-        Tooltip = "Instantly kills one palestinian children.",
-    })
+    local instantCatchToggle = reelTab:create_toggle("Instant Catch")
     
-    local perfectSlider = reelTab:AddSlider("CatchPerfectSlider", {
-        Text = "Perfect Chance",
+    local perfectSlider = reelTab:create_slider("Perfect Chance", {
         Default = 32,
         Min = 1,
-        Suffix = "%",
+        Prefix = "%",
         Max = 100,
-        Rounding = 0,
-        Compact = false,
+        Increment = 1
     })
 
     local CurrentController
@@ -260,6 +230,6 @@ do -- Reel
         end
     end
     
-    autoReelToggle:OnChanged(onReelToggle)
-    instantCatchToggle:OnChanged(onInstantToggle)
+    autoReelToggle:on_changed(onReelToggle)
+    instantCatchToggle:on_changed(onInstantToggle)
 end 

@@ -17,7 +17,7 @@ local rootPart = character:WaitForChild("HumanoidRootPart")
 local world = workspace.world
 local npcs = world.npcs
 
-local autoTabbox = gameTab:AddRightTabbox()
+local autoTabbox = gameTab:create_category("Automation")
 
 
 local function ClickProximityPrompt(prompt)
@@ -67,27 +67,19 @@ do -- appraise
         dialogInteract:InvokeServer(3, 1)
     end
 
-    local appraiseTab = autoTabbox:AddTab("Appraise")
-    local autoAppraiseToggle = appraiseTab:AddToggle("AutoAppraiseToggle", {
-        Text = "Auto-Appraise",
-        Default = false,
-        Tooltip = "Spear da fish.",
-    })
+    local appraiseTab = autoTabbox:create_category("Appraise")
+    local autoAppraiseToggle = appraiseTab:create_toggle("Auto Appraise")
 
-    local attributeType = appraiseTab:AddDropdown("AttributeDropDown", {
-        Values = {
+    local attributeType = appraiseTab:create_dropdown("Attribute", {
+        Options = {
             "Shiny", 
             "Sparkling",
         },
-        Default = 1,
         Multi = true,
-    
-        Text = "Attribute",
-        Tooltip = "List of all attributes.",
     })
 
-    local mutationType = appraiseTab:AddDropdown("mutationDropDown", {
-        Values = { 
+    local mutationType = appraiseTab:create_dropdown("Mutation", {
+        Options = { 
             "Albino",
             "Darkened",
             "Negative",
@@ -116,14 +108,10 @@ do -- appraise
             "Mourned",
             "Shrouded"
         },
-        Default = 1,
         Multi = true,
-    
-        Text = "Mutations",
-        Tooltip = "List of all mutations.",
     })
 
-    autoAppraiseToggle:OnChanged(function(boolean)
+    autoAppraiseToggle:on_changed(function(boolean)
         while autoAppraiseToggle.Value do
             local fishinfo = character:WaitForChild("fishinfo")
             local info = fishinfo.Info
@@ -155,5 +143,5 @@ do -- appraise
 end
 
 do -- enchant
-    local enchantTab = autoTabbox:AddTab("Enchant")
+    local enchantTab = autoTabbox:create_category("Enchant")
 end
