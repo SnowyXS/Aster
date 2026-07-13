@@ -16,7 +16,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Snowy
 local Window = Library:create_window(
 	"Aster", 
 	"rbxassetid://115819865049802", 
-	"v1.0"
+	"v1.0.6"
 )
 local Category = Window:create_category("main")
 
