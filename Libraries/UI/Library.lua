@@ -6,6 +6,7 @@ Base.__index = Base
 local screengui = Instance.new("ScreenGui", game.CoreGui)
 local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/Aster/refs/heads/stable/Libraries/Dependencies/BindableEvents.lua"))()
 
+
 do
 	function Base:create_button(title) 
 		local Window = self.Window
@@ -336,6 +337,7 @@ do
 		local label = {
 			Window = Window,
 			Keybind = nil,
+			is_pressed = false,
 		}
 
 		local changed_bindable = BindableEvents:Create()
@@ -374,7 +376,11 @@ do
 				self.Keybind = bind
 				changed_bindable:Fire(bind)
 			end
-
+			
+			function label:get_state()
+				return self.is_pressed
+			end
+			
 			function label:cancel_bind()
 				keybind_value.Text = `[ {self.Keybind.Name} ]`
 				keybind_value.TextColor3 = Color3.fromRGB(184, 184, 184)
@@ -390,7 +396,17 @@ do
 				local key = input.KeyCode
 				
 				if key == self.Keybind then
-					pressed_bindable:Fire(key)
+					self.is_pressed = true
+					pressed_bindable:Fire(key, true)
+				end
+			end)
+			
+			UserInputService.InputEnded:Connect(function(input)
+				local key = input.KeyCode
+
+				if key == self.Keybind then
+					self.is_pressed = false
+					pressed_bindable:Fire(key, false)
 				end
 			end)
 		end
@@ -690,5 +706,6 @@ function Library.set_properties(instance, properties)
 		instance[i] = v
 	end
 end
+
 
 return Library
