@@ -499,7 +499,8 @@ function Library:create_window(title, icon, version)
 	Window.window_frame = main_frame
 
 	Instance.new("UICorner", main_frame)
-
+	Instance.new("UIDragDetector", main_frame)
+	
 	local top_bar = Instance.new("Frame", main_frame)
 	top_bar.Name = "top_bar"
 	top_bar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
