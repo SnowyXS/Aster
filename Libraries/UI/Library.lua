@@ -37,7 +37,7 @@ do
 				bindable:Fire()
 			end
 		end
-	
+
 		function button:set_category(category)
 			local image_label = Instance.new("ImageLabel", row)
 			image_label.AnchorPoint = Vector2.new(1, 0.5)
@@ -153,8 +153,8 @@ do
 				self.Value + direction * self.Increment, 
 				self.Min, 
 				self.Max
-			))
-			
+				))
+
 			self.Value = value
 			slider_value.Text = `< {value}{self.Prefix} >`
 			bindable:Fire(value)
@@ -172,10 +172,10 @@ do
 
 		return slider
 	end
-	
+
 	function Base:create_dropdown(title, options)
 		if not options.Options or #options.Options == 0 then return end
-		
+
 		local Window = self.Window
 		local dropdown = {
 			Window = Window,
@@ -210,28 +210,28 @@ do
 		function dropdown:fire(...)
 			bindable:Fire(...)
 		end
-		
+
 		function dropdown:get_value()
 			local count = #self.Options
 			if count == 0 then return end
-			
+
 			local value = self.Options[self.Index]
-			
+
 			if self.Multi then
 				local list = {}
-				
+
 				for i, _ in ipairs(self.Options) do
 					if self.Selected[i] then
 						table.insert(list, self.Options[i])
 					end
 				end
-				
+
 				value = list
 			end
-			
+
 			return value
 		end
-		
+
 		function dropdown:set_options(new_options)
 			new_options = new_options or {}
 
@@ -281,44 +281,44 @@ do
 				bindable:Fire(list)
 			end
 		end
-		
+
 		function dropdown:set_value(direction)
 			local count = #self.Options
 			if count == 0 then return end
-			
+
 			local new_index = (self.Index  - 1 + direction) % count + 1
 			local value = self.Options[new_index]
-			
+
 			self.Index  = new_index
 			dropdown_value.Text = `< {value} >`
 			dropdown_value.TextColor3 = self.Selected[new_index] and Color3.fromRGB(39, 255, 6) or Color3.fromRGB(184, 184, 184)
-			
+
 			if not self.Multi then
 				bindable:Fire(value)
 			end
 		end
-		
+
 		function dropdown:click()
 			local count = #self.Options
 			if count == 0 then return end
-			
+
 			if self.Multi then
 				local index = self.Index
 				self.Selected[index] = not self.Selected[index]
-			
+
 				dropdown_value.TextColor3 = self.Selected[index] and Color3.fromRGB(39, 255, 6) or Color3.fromRGB(184, 184, 184)
-				
+
 				local list = {}
 				for i, _ in ipairs(self.Options) do
 					if self.Selected[i] then
 						table.insert(list, self.Options[i])
 					end
 				end
-				
+
 				bindable:Fire(list)
 			end
 		end
-		
+
 		table.insert(objects, dropdown)
 
 		Library.init_highlight(self, row)
@@ -331,6 +331,83 @@ do
 		return dropdown
 	end
 	
+	function Base:create_label(title)
+		local Window = self.Window
+		local label = {
+			Window = Window,
+			Keybind = nil,
+		}
+
+		local changed_bindable = BindableEvents:Create()
+		local pressed_bindable = BindableEvents:Create()
+		local objects = self.objects
+
+		local row = Library.create_row(self.category_frame, title)
+		label.instance = row
+
+		function label:on_changed(func)
+			changed_bindable:Connect(func)
+		end
+		
+		function label:on_keypress(func)
+			pressed_bindable:Connect(func)
+		end
+		
+		function label:add_keybind(keybind)
+			self.Keybind = keybind
+			
+			local keybind_value = Instance.new("TextLabel", row)
+			keybind_value.AnchorPoint = Vector2.new(1, 0.5)
+			keybind_value.TextColor3 = Color3.fromRGB(184, 184, 184)
+			keybind_value.BackgroundTransparency = 1
+			keybind_value.FontFace = Font.fromEnum(Enum.Font.SourceSans)
+			keybind_value.TextSize = 14
+			keybind_value.Text = `[ {keybind.Name} ]`
+			keybind_value.TextXAlignment = Enum.TextXAlignment.Right
+			keybind_value.Position = UDim2.new(1, -6, 0.5, 1)
+			keybind_value.Size = UDim2.new(1, 0, 0, 35)
+			
+			function label:set_keybind(bind)
+				keybind_value.Text = `[ {bind.Name} ]`
+				keybind_value.TextColor3 = Color3.fromRGB(184, 184, 184)
+				
+				self.Keybind = bind
+				changed_bindable:Fire(bind)
+			end
+
+			function label:cancel_bind()
+				keybind_value.Text = `[ {self.Keybind.Name} ]`
+				keybind_value.TextColor3 = Color3.fromRGB(184, 184, 184)
+			end
+
+			function label:click()
+				keybind_value.Text = "[ ... ]"
+				keybind_value.TextColor3 = Color3.fromRGB(255, 200, 0)
+				Window.binder = self
+			end
+			
+			UserInputService.InputBegan:Connect(function(input)
+				local key = input.KeyCode
+				
+				if key == self.Keybind then
+					pressed_bindable:Fire(key)
+				end
+			end)
+		end
+		
+		table.insert(objects, label)
+
+		Library.init_highlight(self, row)
+
+		self.size = self.size + 1
+		if Window.current_category == self then
+			Window:resize(self)
+		end
+
+		return label
+
+	end
+	
 	function Base:create_category(title)
 		local Window = self.Window
 		local category = Window:create_category(title)
@@ -338,7 +415,7 @@ do
 
 		return category
 	end
-	
+
 	function Base:move(amount)
 		local objects = self.objects
 		local count = #objects
@@ -423,7 +500,7 @@ function Library:create_window(title, icon, version)
 	title_label.TextSize = 14
 	title_label.TextColor3 = Color3.fromRGB(255, 255, 255)
 	title_label.BackgroundTransparency = 1
-		
+
 	local UIPadding = Instance.new("UIPadding", title_label)
 	UIPadding.PaddingLeft = icon and UDim.new(0, 30) or UDim.new(0,12)
 
@@ -504,7 +581,15 @@ function Library:create_window(title, icon, version)
 		Window:resize(category)
 		table.insert(opened_categories, category)
 	end
-
+	
+	function Window.set_visible(value)
+		main_frame.Visible = value
+	end
+	
+	function Window.is_visible()
+		return main_frame.Visible
+	end
+	
 	function Window:close_category()
 		if #opened_categories <= 1 then return end 
 		table.remove(opened_categories)
@@ -524,25 +609,38 @@ function Library:create_window(title, icon, version)
 	function Window:resize(category)
 		main_frame.Size = UDim2.new(0, 300, 0, 70 + category.size * 35)
 	end
-	
+
 	UserInputService.InputBegan:Connect(function(input)
 		local key = input.KeyCode
-		local category = Window.current_category
 
-		if key == Enum.KeyCode.Up then
-			category:move(-1)
-		elseif key == Enum.KeyCode.Down then
-			category:move(1)
-		elseif key == Enum.KeyCode.Left then
-			category:slider_step(-1)
-		elseif key == Enum.KeyCode.Right then
-			category:slider_step(1)
-		elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter then
-			category:click()
-		elseif key == Enum.KeyCode.Backspace then
-			Window:close_category()
-		elseif key == Enum.KeyCode.Insert then
-			main_frame.Visible = not main_frame.Visible
+		if Window.is_visible() then
+			local binder = Window.binder
+			
+			if binder and binder.Keybind ~= key and key ~= Enum.KeyCode.Unknown then
+				Window.binder = nil
+				
+				if key == Enum.KeyCode.Escape then
+					return binder:cancel_bind()
+				end
+				
+				return binder:set_keybind(key)
+			end
+			
+			local category = Window.current_category
+
+			if key == Enum.KeyCode.Up then
+				category:move(-1)
+			elseif key == Enum.KeyCode.Down then
+				category:move(1)
+			elseif key == Enum.KeyCode.Left then
+				category:slider_step(-1)
+			elseif key == Enum.KeyCode.Right then
+				category:slider_step(1)
+			elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter then
+				category:click()
+			elseif key == Enum.KeyCode.Backspace then
+				Window:close_category()
+			end
 		end
 	end)
 
@@ -565,7 +663,7 @@ function Library.create_row(category_frame, title)
 	text_button.TextColor3 = Color3.fromRGB(184, 184, 184)
 	text_button.BackgroundTransparency = 1
 	text_button.BorderSizePixel = 0
-	
+
 	local UIPadding = Instance.new("UIPadding", text_button)
 	UIPadding.PaddingLeft = UDim.new(0, 12)
 
