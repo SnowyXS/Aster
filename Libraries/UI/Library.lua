@@ -409,6 +409,8 @@ do
 					pressed_bindable:Fire(key, false)
 				end
 			end)
+
+			return self
 		end
 		
 		table.insert(objects, label)
