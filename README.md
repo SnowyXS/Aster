@@ -23,3 +23,7 @@
 * [ ]  Fix coding style in old code
 * [x]  Performance improvements
 * [x]  Fix known bugs
+
+### Menu Explanation
+* Navigation -> Arrows Key
+* Press -> Enter Key
