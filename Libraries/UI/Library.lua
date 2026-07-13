@@ -55,8 +55,8 @@ do
 
 		self.size = self.size + 1
 		if Window.current_category == self then
-            Window:resize(self)
-        end
+			Window:resize(self)
+		end
 
 		return button
 	end
@@ -105,8 +105,8 @@ do
 
 		self.size = self.size + 1
 		if Window.current_category == self then
-            Window:resize(self)
-        end
+			Window:resize(self)
+		end
 
 		return toggle
 	end
@@ -118,7 +118,7 @@ do
 			Window = Window,
 			Min = options.Min,
 			Max = options.Max,
-			Increment = options.Increment,
+			Increment = options.Increment or 1,
 			Prefix = options.Prefix or "",
 			Value = options.Default
 		}
@@ -149,10 +149,12 @@ do
 		end
 
 		function slider:set_value(direction)
-			local value = math.clamp(self.Value + direction * self.Increment, self.Min, self.Max)
-			local decimals = math.max(0, -math.floor(math.log10(self.Increment)))
-			value = math.floor(value * (10 ^ decimals) + 0.5) / (10 ^ decimals)
-
+			local value = Library.round_float(math.clamp(
+				self.Value + direction * self.Increment, 
+				self.Min, 
+				self.Max
+			))
+			
 			self.Value = value
 			slider_value.Text = `< {value}{self.Prefix} >`
 			bindable:Fire(value)
@@ -163,14 +165,122 @@ do
 		Library.init_highlight(self, row)
 
 		self.size = self.size + 1
-        
+
 		if Window.current_category == self then
-            Window:resize(self)
-        end
+			Window:resize(self)
+		end
 
 		return slider
 	end
+	
+	function Base:create_dropdown(title, options)
+		if not options.Options or #options.Options == 0 then return end
+		
+		local Window = self.Window
+		local dropdown = {
+			Window = Window,
+			Options = options.Options,
+			Multi = options.Multi or false,
+			Index  = 1,
+			Selected = {},
+		}
 
+		local bindable = BindableEvents:Create()
+		local objects = self.objects
+
+		local row = Library.create_row(self.category_frame, title)
+		dropdown.instance = row
+
+		local dropdown_value = Instance.new("TextLabel", row)
+		dropdown_value.AnchorPoint = Vector2.new(1, 0.5)
+		dropdown_value.TextColor3 = Color3.fromRGB(184, 184, 184)
+		dropdown_value.BackgroundTransparency = 1
+		dropdown_value.FontFace = Font.fromEnum(Enum.Font.SourceSans)
+		dropdown_value.TextSize = 14
+		dropdown_value.Text = `< {dropdown.Options[dropdown.Index]} >`
+		dropdown_value.TextXAlignment = Enum.TextXAlignment.Right
+		dropdown_value.Position = UDim2.new(1, -6, 0.5, 1)
+		dropdown_value.Size = UDim2.new(1, 0, 0, 35)
+		dropdown_value.RichText = true
+
+		function dropdown:on_changed(func)
+			bindable:Connect(func)
+		end
+
+		function dropdown:fire(...)
+			bindable:Fire(...)
+		end
+		
+		function dropdown:get_value()
+			local count = #self.Options
+			if count == 0 then return end
+			
+			local value = self.Options[self.Index]
+			
+			if self.Multi then
+				local list = {}
+				
+				for i, _ in ipairs(self.Options) do
+					if self.Selected[i] then
+						table.insert(list, self.Options[i])
+					end
+				end
+				
+				value = list
+			end
+			
+			return value
+		end
+		
+		function dropdown:set_value(direction)
+			local count = #self.Options
+			if count == 0 then return end
+			
+			local new_index = (self.Index  - 1 + direction) % count + 1
+			local value = self.Options[new_index]
+			
+			self.Index  = new_index
+			dropdown_value.Text = `< {value} >`
+			dropdown_value.TextColor3 = self.Selected[new_index] and Color3.fromRGB(39, 255, 6) or Color3.fromRGB(184, 184, 184)
+			
+			if not self.Multi then
+				bindable:Fire(value)
+			end
+		end
+		
+		function dropdown:click()
+			local count = #self.Options
+			if count == 0 then return end
+			
+			if self.Multi then
+				local index = self.Index
+				self.Selected[index] = not self.Selected[index]
+			
+				dropdown_value.TextColor3 = self.Selected[index] and Color3.fromRGB(39, 255, 6) or Color3.fromRGB(184, 184, 184)
+				
+				local list = {}
+				for i, _ in ipairs(self.Options) do
+					if self.Selected[i] then
+						table.insert(list, self.Options[i])
+					end
+				end
+				
+				bindable:Fire(list)
+			end
+		end
+		
+		table.insert(objects, dropdown)
+
+		Library.init_highlight(self, row)
+
+		self.size = self.size + 1
+		if Window.current_category == self then
+			Window:resize(self)
+		end
+
+		return dropdown
+	end
+	
 	function Base:create_category(title)
 		local Window = self.Window
 		local category = Window:create_category(title)
@@ -178,7 +288,7 @@ do
 
 		return category
 	end
-
+	
 	function Base:move(amount)
 		local objects = self.objects
 		local count = #objects
@@ -216,7 +326,7 @@ do
 		end
 	end
 
-	function Base:step(direction)
+	function Base:slider_step(direction)
 		local obj = self.objects[self.selected]
 
 		if obj and obj.set_value then
@@ -258,18 +368,21 @@ function Library:create_window(title, icon, version)
 	title_label.Name = "title"
 	title_label.Text = title
 	title_label.Size = UDim2.new(0.2, 0, 1, 0)
-	title_label.Position = UDim2.new(0, 20, 0, 0)
+	title_label.TextXAlignment = Enum.TextXAlignment.Left
 	title_label.FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 	title_label.TextSize = 14
 	title_label.TextColor3 = Color3.fromRGB(255, 255, 255)
 	title_label.BackgroundTransparency = 1
+		
+	local UIPadding = Instance.new("UIPadding", title_label)
+	UIPadding.PaddingLeft = icon and UDim.new(0, 30) or UDim.new(0,12)
 
 	local icon_label = Instance.new("ImageLabel", top_bar)
 	icon_label.Name = "icon"
 	icon_label.Position = UDim2.new(0, 2, 0, 2)
 	icon_label.Size = UDim2.new(0, 30, 0, 30)
 	icon_label.BackgroundTransparency = 1
-	icon_label.Image = icon
+	icon_label.Image = icon or 0
 
 	local holder_frame = Instance.new("Frame", main_frame)
 	holder_frame.Name = "holder"
@@ -291,7 +404,7 @@ function Library:create_window(title, icon, version)
 
 	local version_label = Instance.new("TextLabel", bottom_bar)
 	version_label.Name = "version"
-	version_label.Text = version
+	version_label.Text = version or "v1.0.0"
 	version_label.Size = UDim2.new(0.073, 35, 1, 0)
 	version_label.Position = UDim2.new(0, 0, 0, 0)
 	version_label.FontFace = Font.new("rbxasset://fonts/families/Roboto.json")
@@ -371,9 +484,9 @@ function Library:create_window(title, icon, version)
 		elseif key == Enum.KeyCode.Down then
 			category:move(1)
 		elseif key == Enum.KeyCode.Left then
-			category:step(-1)
+			category:slider_step(-1)
 		elseif key == Enum.KeyCode.Right then
-			category:step(1)
+			category:slider_step(1)
 		elseif key == Enum.KeyCode.Return or key == Enum.KeyCode.KeypadEnter then
 			category:click()
 		elseif key == Enum.KeyCode.Backspace then
@@ -400,7 +513,7 @@ function Library.create_row(category_frame, title)
 	text_button.TextColor3 = Color3.fromRGB(184, 184, 184)
 	text_button.BackgroundTransparency = 1
 	text_button.BorderSizePixel = 0
-
+	
 	local UIPadding = Instance.new("UIPadding", text_button)
 	UIPadding.PaddingLeft = UDim.new(0, 12)
 
@@ -415,6 +528,11 @@ function Library.init_highlight(category, text_button)
 		text_button.BackgroundTransparency = 0.5
 		text_button.BackgroundColor3 = Color3.fromRGB(77, 15, 138)
 	end
+end
+
+function Library.round_float(value)
+	local ratio = 10 ^ 2
+	return math.round(value * ratio) / ratio
 end
 
 function Library.set_properties(instance, properties)
