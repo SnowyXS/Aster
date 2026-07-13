@@ -8,7 +8,7 @@ local LocalPlayer = Players.LocalPlayer
 local character = LocalPlayer.Character
 
 local rootPart = character:WaitForChild("HumanoidRootPart")
-local teleportTab Category:create_category("Teleport")
+local teleportTab = Category:create_category("Teleport")
 
 local function get_players_string()
     local player_list = {}
@@ -33,7 +33,7 @@ do -- Teleports
         local teleportButton = playersTab:create_button("Teleport")
 
         teleportButton:on_changed(function() 
-            local player = Players:FindFirstChild(playersDropDown.Value)
+            local player = Players:FindFirstChild(playersDropDown:get_value())
             if not player then return end
             
             local character = player.Character
@@ -75,7 +75,7 @@ do -- Teleports
         local teleportButton = locationTab:create_button("Teleport")
 
         teleportButton:on_changed(function() 
-            local location = dropDown.Value
+            local location = dropDown:get_value()
             if not location then return end
 
             local cframe = locations[location]

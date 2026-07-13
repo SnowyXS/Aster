@@ -14,7 +14,7 @@ local LoadedFeatures = {
     "AutoFish",
     "PlayerModifications",
     "Automation",
-    --"Teleport",
+    "Teleport",
     --"Misc",
 }
 

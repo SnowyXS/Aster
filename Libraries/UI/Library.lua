@@ -244,9 +244,20 @@ do
 				end
 			end
 
+			local old_value = self.Options[self.Index]
+
 			self.Options = new_options
 			self.Selected = {}
+
 			self.Index = 1
+			if old_value ~= nil then
+				for i, opt in ipairs(self.Options) do
+					if opt == old_value then
+						self.Index = i
+						break
+					end
+				end
+			end
 
 			if self.Multi then
 				for i, opt in ipairs(self.Options) do

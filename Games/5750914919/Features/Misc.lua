@@ -25,7 +25,7 @@ local events = ReplicatedStorage.events
 local world = workspace.world
 local npcs = world.npcs
 
-local box = gameTab:AddRightTabbox()
+local box = gameTab:create_category("Misc")
 
 do -- Misc
     
@@ -38,7 +38,7 @@ do -- Misc
     local inventory = backpack.inventory
     local topButtons = inventory.TopButtons
 
-    local miscTab = box:AddTab("Misc")
+    local miscTab = box:create_category("Risky Functions")
 
     local function ClickProximityPrompt(prompt)
         local part = Instance.new("Part")
@@ -67,17 +67,13 @@ do -- Misc
     end
 
     do -- Spear Fishing
-        local spearFishingToggle = miscTab:AddToggle("SpearFishingToggle", {
-            Text = "Spear Fishing (Risky)",
-            Default = false,
-            Tooltip = "Spear da fish.",
-        })
+        local spearFishingToggle = miscTab:create_toggle("Spear Fishing")
             
         local spearWater = workspace["Spearfishing Water"]
         local minigame = netModule["RE/SpearFishing/Minigame"]
         local junglePos = Vector3.new(-2713.29638671875, 157.14395141601562, -2058.97998046875)
 
-        spearFishingToggle:OnChanged(function(value)
+        spearFishingToggle:on_changed(function(value)
             LocalPlayer:RequestStreamAroundAsync(junglePos)
                 
             while spearFishingToggle.Value do
@@ -102,11 +98,7 @@ do -- Misc
         local appraiseButton = topButtons.Appraise
         local appraiseButtonCon = getconnections(appraiseButton.Activated)[1]
         local appraiseButtonFunc = appraiseButtonCon.Function
-        local appraiseToggle = miscTab:AddToggle("AppraiseToggle", {
-            Text = "Unlock Appraise Gamepass",
-            Default = false,
-            Tooltip = "Lets you use appraise anywhere gamepass for free.",
-        })
+        local appraiseToggle = miscTab:create_toggle("Unlock Appraise Gamepass")
         
         local dialogInteract = netModule["RF/DialogInteract"]
 
@@ -141,11 +133,7 @@ do -- Misc
         local sellEvent = events.SellAll
         local sellButton = topButtons.Sell
         local sellButtonCon = getconnections(sellButton.Activated)[1]
-        local sellToggle = miscTab:AddToggle("SellToggle", {
-            Text = "Unlock Sell Gamepass",
-            Default = false,
-            Tooltip = "Lets you use sell all anywhere gamepass for free.",
-        })
+        local sellToggle = miscTab:create_toggle("Unlock Sell Gamepass")
 
         LocalPlayer:RequestStreamAroundAsync(
             Vector3.new(383.10113525390625, 131.2406005859375, 243.93385314941406)
@@ -176,7 +164,7 @@ do -- Misc
             return Original()
         end)
     end
-
+    --[[ Temporarily disabled due to missing keybinds on ui library
     do --  Fast Place Crab Cages
         local SharedCrabCage = require(sharedModules:WaitForChild("SharedCrabCage"))
         local CrabCageController = require(ReplicatedStorage.client.legacyControllers.CrabCageController)
@@ -219,7 +207,7 @@ do -- Misc
             end
         end)
     end
-
+    ]]
     local function OnCharacterAdded(newCharacter)
         character = newCharacter
         rootPart = character:WaitForChild("HumanoidRootPart")
@@ -254,48 +242,41 @@ do -- Items
         table.insert(crates, i)
     end
             
-    local itemsTab = box:AddTab("Shop")
+    local itemsTab = box:create_category("Shop")
 
-    local rodsDropDown = itemsTab:AddDropdown("rodsDown", {
-        Values = rods,
-        Default = 1,
-        Multi = false,
-            
-        Text = "Rods",
-        Tooltip = "This is a tooltip",
-    })
+    do -- Rods
+        local rodsTab = itemsTab:create_category("Rods")
+        local rodsDropDown = rodsTab:create_dropdown("Rod", {
+            Options = rods,
+        })
 
-    itemsTab:AddButton("Buy", function() 
-        local rod = rodsDropDown.Value
-        purchaseRemote:FireServer(rod, "Rod", nil, 1)
-    end)
-    itemsTab:AddDivider()
+        local buybutton = rodsTab:create_button("Buy")
 
-    local cratesDropDown = itemsTab:AddDropdown("cratesDown", {
-        Values = crates,
-        Default = 1,
-        Multi = false,
-    
-        Text = "Crates",
-        Tooltip = "This is a tooltip",
-    })
+        buybutton:on_changed(function() 
+            local rod = rodsDropDown:get_value()
+            purchaseRemote:FireServer(rod, "Rod", nil, 1)
+        end)
+    end
 
-    local cratesAmount = itemsTab:AddSlider("CrateAmountSlider", {
-        Text = "Amount",
-        Default = 1,
-        Min = 1,
-        Max = 500,
-        Rounding = 0,
-        Compact = false,
-    })
+    do -- Crates
+        local cratesTab = itemsTab:create_category("Crates")
 
-    itemsTab:AddButton("Buy", function() 
-        local crate = cratesDropDown.Value
-        local amount = cratesAmount.Value
-        purchaseRemote:FireServer(crate, "fish", nil, amount)
-    end)
-end
+        local cratesDropDown = cratesTab:create_dropdown("Crate", {
+            Options = crates,
+        })
 
-do -- Bestiary
-    local bestiaryTab = box:AddTab("Bestiary")
+        local cratesAmount = cratesTab:create_slider("Amount", {
+            Default = 1,
+            Min = 1,
+            Max = 50,
+        })
+
+        local buybutton = cratesTab:create_button("Buy")
+
+        buybutton:on_changed(function() 
+            local crate = cratesDropDown:get_value()
+            local amount = cratesAmount.Value
+            purchaseRemote:FireServer(crate, "fish", nil, amount)
+        end)
+    end
 end
