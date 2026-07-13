@@ -20,5 +20,6 @@
 
 * [x]  Clean up & optimize code
 * [ ]  Clean up UI Codebase
+* [ ]  Fix coding style in old code
 * [x]  Performance improvements
 * [x]  Fix known bugs
