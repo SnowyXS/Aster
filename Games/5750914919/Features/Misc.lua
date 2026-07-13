@@ -164,40 +164,30 @@ do -- Misc
             return Original()
         end)
     end
-    --[[ Temporarily disabled due to missing keybinds on ui library
+
     do --  Fast Place Crab Cages
+        local crabTab = box:create_category("Crab Cages")
         local SharedCrabCage = require(sharedModules:WaitForChild("SharedCrabCage"))
         local CrabCageController = require(ReplicatedStorage.client.legacyControllers.CrabCageController)
-        miscTab:AddDivider()
-        
-        miscTab:AddLabel("Fast Place | Crab Cages"):AddKeyPicker("FastPlace", {
-            Default = "Z",
-            Mode = "Hold",
-            NoUI = false, 
-            Text = "Fast Place Crab Cages",
-        })
 
-        miscTab:AddLabel("Fast Claim | Crab Cages"):AddKeyPicker("FastClaim", {
-            Default = "X",
-            NoUI = false, 
-            Text = "Fast Claim Crab Cages",
+        local fast_place = crabTab:create_label("Fast Place"):add_keybind(Enum.KeyCode.Z)
+        local fast_claim = crabTab:create_label("Fast Claim"):add_keybind(Enum.KeyCode.X)
 
-            Callback = function(Value)
-                for _, v in pairs(CrabCageController.ActiveCages) do
-                    local data = v.data.s
+        fast_claim:on_keypress(function()
+            for _, v in pairs(CrabCageController.ActiveCages) do
+                local data = v.data.s
 
-                    if data == SharedCrabCage.CageState.Claimable then
-                        CrabCageController:Claim(v)
+                if data == SharedCrabCage.CageState.Claimable then
+                    CrabCageController:Claim(v)
 
-                        task.wait(0.1)
-                    end
+                    task.wait(0.1)
                 end
-            end,
-        })
+            end
+        end)
 
         task.spawn(function()
             while true do
-                local state = Options.FastPlace:GetState()
+                local state = fast_place:get_state()
 
                 if state and CrabCageController._HeldCage then
                     CrabCageController:Place(CrabCageController._HeldCage, CrabCageController._PreviewModel:GetPivot())
@@ -207,7 +197,7 @@ do -- Misc
             end
         end)
     end
-    ]]
+
     local function OnCharacterAdded(newCharacter)
         character = newCharacter
         rootPart = character:WaitForChild("HumanoidRootPart")

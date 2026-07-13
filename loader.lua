@@ -18,14 +18,17 @@ local Window = Library:create_window(
 	"rbxassetid://115819865049802", 
 	"v1.0"
 )
+local Category = Window:create_category("main")
 
 getgenv().Snowy = {
     UI = {
         Library = Library,
         Window = Window,
-        Category = Window:create_category("main")
+        Category = Category
     },
 }
+
+Window.set_visible(false)
 
 -- Loader logic -- 
 
@@ -98,6 +101,17 @@ for _, folder in pairs(games) do
         cleardrawcache()
     end
 end
+
+local settings = Category:create_category("Settings")
+local menu_key =  settings:create_label("Menu Key"):add_keybind(Enum.KeyCode.Insert)
+
+menu_key:on_keypress(function(key, is_pressed)
+    if is_pressed then
+        Window.set_visible(not Window.window_frame.Visible)
+    end
+end)
+
+Window.set_visible(true)
 
 --[[
 SaveManager:SetFolder("Aster/Configs/" .. gameID)
