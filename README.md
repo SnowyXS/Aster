@@ -19,5 +19,6 @@
 ### Improvements
 
 * [x]  Clean up & optimize code
+* [ ]  Clean up UI Codebase
 * [x]  Performance improvements
 * [x]  Fix known bugs
