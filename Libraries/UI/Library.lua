@@ -4,7 +4,7 @@ local Base = {}
 Base.__index = Base
 
 local screengui = Instance.new("ScreenGui", game.CoreGui)
-local BindableEvents = loadfile("Aster/Libraries/Dependencies/BindableEvents.lua")()
+local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/Aster/refs/heads/stable/Libraries/Dependencies/BindableEvents.lua"))()
 
 do
 	function Base:create_button(title) 
