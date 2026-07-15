@@ -3,7 +3,7 @@ local Library = {}
 local Base = {}
 Base.__index = Base
 
-local screengui = Instance.new("ScreenGui", game.CoreGui)
+local screengui = Instance.new("ScreenGui", gethui())
 local BindableEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/SnowyXS/Aster/refs/heads/stable/Libraries/Dependencies/BindableEvents.lua"))()
 
 
